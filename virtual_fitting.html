@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Виртуальная примерочная</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+    }
+    .container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 320px;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 22px;
+      border-bottom: 2px solid #007BFF;
+      padding-bottom: 10px;
+    }
+    .sidebar label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    .sidebar input, .sidebar select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .sidebar button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .sidebar button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+      text-align: center;
+    }
+    .content h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .sketchfab-embed-wrapper {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .message {
+      font-size: 18px;
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Настройки</h2>
+      <label for="gender">Пол:</label>
+      <select id="gender">
+        <option value="">Выберите пол</option>
+        <option value="male">Мужской</option>
+        <option value="female">Женский</option>
+      </select>
+      <label for="height">Рост (в см):</label>
+      <input type="number" id="height" min="0">
+      <label for="weight">Вес (в кг):</label>
+      <input type="number" id="weight" min="0">
+      <label for="chest">Обхват груди (в см):</label>
+      <input type="number" id="chest" min="0">
+      <label for="waist">Обхват талии (в см):</label>
+      <input type="number" id="waist" min="0">
+      <label for="hips">Обхват бедер (в см):</label>
+      <input type="number" id="hips" min="0">
+      <button id="tryOn" disabled>Примерить</button>
+    </div>
+    <div class="content">
+      <h2>Виртуальная примерка</h2>
+      <div id="modelContainer" class="sketchfab-embed-wrapper">
+        <p class="message">После ввода данных нажмите «примерить»</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const genderSelect = document.getElementById('gender');
+    const heightInput = document.getElementById('height');
+    const tryOnButton = document.getElementById('tryOn');
+    const modelContainer = document.getElementById('modelContainer');
+    
+    const modelEmbeds = {
+      high: '<iframe src="https://sketchfab.com/models/0ce8277ac3864dbbbde95aaa36140dc8/embed"></iframe>',
+      medium: '<iframe src="https://sketchfab.com/models/0d344d388e7c465c802109737fcd3318/embed"></iframe>',
+      low: '<iframe src="https://sketchfab.com/models/fee26fdf9976410e9de46373683d1601/embed"></iframe>'
+    };
+    
+    const sizeRanges = {
+      high: { weight: [75, 100], chest: [95, 115], waist: [75, 95], hips: [90, 110] },
+      medium: { weight: [65, 85], chest: [90, 105], waist: [70, 90], hips: [85, 105] },
+      low: { weight: [55, 75], chest: [85, 100], waist: [65, 85], hips: [80, 100] }
+    };
+    
+    function checkRequiredFields() {
+      tryOnButton.disabled = !(genderSelect.value && heightInput.value);
+    }
+    genderSelect.addEventListener('change', checkRequiredFields);
+    heightInput.addEventListener('input', checkRequiredFields);
+    
+    function tryOn() {
+      const gender = genderSelect.value;
+      const height = parseInt(heightInput.value, 10);
+      const weight = parseInt(document.getElementById('weight').value, 10);
+      const chest = parseInt(document.getElementById('chest').value, 10);
+      const waist = parseInt(document.getElementById('waist').value, 10);
+      const hips = parseInt(document.getElementById('hips').value, 10);
+      
+      if (!gender || isNaN(height)) return;
+      
+      if (gender === 'female') {
+        modelContainer.innerHTML = '<p class="message">Женские модели пока не поддерживаются</p>';
+        return;
+      }
+      
+      let model;
+      if (height >= 184) model = 'high';
+      else if (height >= 173) model = 'medium';
+      else model = 'low';
+      
+      const range = sizeRanges[model];
+      if (weight < range.weight[0] || weight > range.weight[1] ||
+          chest < range.chest[0] || chest > range.chest[1] ||
+          waist < range.waist[0] || waist > range.waist[1] ||
+          hips < range.hips[0] || hips > range.hips[1]) {
+        modelContainer.innerHTML = '<p class="message">Введённые параметры некорректные или пока не поддерживаются</p>';
+      } else {
+        modelContainer.innerHTML = modelEmbeds[model];
+      }
+    }
+    tryOnButton.addEventListener('click', tryOn);
+  </script>
+</body>
+</html>
+
