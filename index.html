@@ -5,139 +5,265 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Виртуальная примерочная</title>
   <style>
-    body {margin: 0; font-family: Arial, sans-serif; background-color: #f8f9fa; display: flex;}
-    .container {display: flex; width: 100%; min-height: 100vh;}
-    .sidebar {width: 320px; padding: 20px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1);}
-    .sidebar h2 {margin-top: 0; font-size: 22px; border-bottom: 2px solid #007BFF; padding-bottom: 10px;}
-    .sidebar label {display: block; margin: 10px 0 5px;}
-    .sidebar label.required::after {content: " *"; color: red;}
-    .sidebar input, .sidebar select {width: 100%; padding: 8px; box-sizing: border-box;}
-    .sidebar button {margin-top: 20px; padding: 10px; width: 100%; background-color: #007BFF; color: #fff; border: none; cursor: pointer; font-size: 16px;}
-    .sidebar button:disabled {background-color: #cccccc; cursor: not-allowed;}
-    .content {flex-grow: 1; padding: 20px; text-align: center;}
-    .content h2 {font-size: 24px; margin-bottom: 20px; color: #333;}
-    .sketchfab-embed-wrapper {width: 100%; max-width: 800px; margin: 0 auto;}
-    iframe {width: 100%; height: 400px; border: none;}
-    .message {font-size: 18px; color: #d9534f;}
-    .recommendation {margin-top: 10px;}
-    .recommendation p {font-size: 18px; font-weight: bold; margin: 5px 0;}
-    .recommendation button {padding: 10px 20px; font-size: 16px; background-color: #28a745; color: #fff; border: none; cursor: pointer; border-radius: 4px;}
-    .recommendation button:hover {opacity: 0.9;}
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #f4f4f8, #e8ecf3);
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+    .container {
+      display: flex;
+      width: 100%;
+      margin: auto;
+      max-width: 1200px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .form-section {
+      width: 35%;
+      padding: 40px;
+      background: #fff;
+    }
+    .form-section h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 24px;
+      border-bottom: 2px solid #4a90e2;
+      padding-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    label.required::after {
+      content: '*';
+      color: red;
+      margin-left: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    input:focus, select:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      background-color: #4a90e2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #357ab8;
+    }
+    .model-section {
+      flex-grow: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f9fafb;
+    }
+    .model-section h2 {
+      margin-top: 0;
+      font-size: 28px;
+      color: #4a90e2;
+    }
+    .iframe-wrapper {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: 0;
+    }
+    #message {
+      color: #e74c3c;
+      font-weight: 500;
+      margin-top: 15px;
+    }
+    #recommendation {
+      margin-top: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+    #buyBtn {
+      margin-top: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #buyBtn:hover {
+      background-color: #1e8449;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="sidebar">
-      <h2>Настройки</h2>
-      <label for="gender" class="required">Пол:</label>
-      <select id="gender">
-        <option value="">Выберите пол</option>
-        <option value="male">Мужской</option>
-        <option value="female">Женский</option>
-      </select>
-      <label for="height" class="required">Рост (в см):</label>
-      <input type="number" id="height" min="0">
-      <label for="weight">Вес (в кг):</label>
-      <input type="number" id="weight" min="0">
-      <label for="chest">Обхват груди (в см):</label>
-      <input type="number" id="chest" min="0">
-      <label for="waist">Обхват талии (в см):</label>
-      <input type="number" id="waist" min="0">
-      <label for="hips">Обхват бедер (в см):</label>
-      <input type="number" id="hips" min="0">
-      <button id="tryOn" disabled>Примерить</button>
-    </div>
-    <div class="content">
-      <h2>Виртуальная примерка</h2>
-      <div id="modelContainer" class="sketchfab-embed-wrapper">
-        <p class="message">После ввода данных нажмите «примерить»</p>
+    <div class="form-section">
+      <h2>Введите параметры</h2>
+      <div class="form-group">
+        <label class="required">Пол:</label>
+        <select id="gender">
+          <option value="">Выберите</option>
+          <option value="male">Мужской</option>
+          <option value="female">Женский</option>
+        </select>
       </div>
+      <div class="form-group">
+        <label class="required">Рост (в см):</label>
+        <input type="number" id="height">
+      </div>
+      <div class="form-group">
+        <label>Вес (в кг):</label>
+        <input type="number" id="weight">
+      </div>
+      <div class="form-group">
+        <label>Обхват груди (в см):</label>
+        <input type="number" id="chest">
+      </div>
+      <div class="form-group">
+        <label>Обхват талии (в см):</label>
+        <input type="number" id="waist">
+      </div>
+      <div class="form-group">
+        <label>Обхват бедер (в см):</label>
+        <input type="number" id="hips">
+      </div>
+      <button onclick="tryOn()">Примерить</button>
+      <div id="message"></div>
+    </div>
+    <div class="model-section">
+      <h2>Виртуальная примерка</h2>
+      <div id="modelContainer"></div>
+      <div id="recommendation"></div>
+      <a id="buyBtn" href="https://www.ozon.ru/cart" target="_blank" style="display:none">В корзину</a>
     </div>
   </div>
   <script>
-    const genderSelect = document.getElementById('gender');
-    const heightInput = document.getElementById('height');
-    const tryOnButton = document.getElementById('tryOn');
-    const modelContainer = document.getElementById('modelContainer');
-    
-    const modelEmbeds = {
-      male: { high: '<iframe src="https://sketchfab.com/models/0ce8277ac3864dbbbde95aaa36140dc8/embed"></iframe>',
-              medium: '<iframe src="https://sketchfab.com/models/0d344d388e7c465c802109737fcd3318/embed"></iframe>',
-              low: '<iframe src="https://sketchfab.com/models/fee26fdf9976410e9de46373683d1601/embed"></iframe>' },
-      female: { slim: '<iframe title="slim female with red sweater" src="https://sketchfab.com/models/1d651c5b6f72424587272ef0ccf4cba1/embed"></iframe>',
-                fat: '<iframe title="fat female with red sweater" src="https://sketchfab.com/models/9da5c5ef9cc745db8eeb0c8ad409f7a1/embed"></iframe>' }
-    };
-    
-    const sizeRanges = {
-      male: {
-        high: { height: [184, 210], weight: [75, 100], chest: [95, 115], waist: [75, 95], hips: [90, 110], size: '50-52' },
-        medium: { height: [173, 183], weight: [65, 85], chest: [90, 105], waist: [70, 90], hips: [85, 105], size: '48-50' },
-        low: { height: [150, 172], weight: [55, 75], chest: [85, 100], waist: [65, 85], hips: [80, 100], size: '46-48' }
-      },
-      female: {
-        slim: { weight: [50, 75], chest: [80, 90], waist: [60, 70], hips: [85, 95], size: '44' },
-        fat: { weight: [75, 90], chest: [95, 110], waist: [85, 100], hips: [100, 115], size: '46' }
-      }
-    };
-
-    function checkRequiredFields() {
-      tryOnButton.disabled = !(genderSelect.value && heightInput.value);
-    }
-    genderSelect.addEventListener('change', checkRequiredFields);
-    heightInput.addEventListener('input', checkRequiredFields);
-
     function tryOn() {
-      const gender = genderSelect.value;
-      const height = parseInt(heightInput.value, 10);
-      const weightVal = document.getElementById('weight').value;
-      const weight = parseInt(weightVal, 10);
-      const chest = parseInt(document.getElementById('chest').value, 10);
-      const waist = parseInt(document.getElementById('waist').value, 10);
-      const hips = parseInt(document.getElementById('hips').value, 10);
-      if (!gender || isNaN(height)) return;
+      const gender = document.getElementById("gender").value;
+      const height = parseInt(document.getElementById("height").value);
+      const weightVal = document.getElementById("weight").value;
+      const weight = parseInt(weightVal);
+      const chest = parseInt(document.getElementById("chest").value);
+      const waist = parseInt(document.getElementById("waist").value);
+      const hips = parseInt(document.getElementById("hips").value);
+      const modelContainer = document.getElementById("modelContainer");
+      const message = document.getElementById("message");
+      const recommendation = document.getElementById("recommendation");
+      const buyBtn = document.getElementById("buyBtn");
 
-      let category, range;
-      if (gender === 'male') {
-        if (height < sizeRanges.male.low.height[0] || height > sizeRanges.male.high.height[1]) {
-          modelContainer.innerHTML = '<p class="message">Введённые параметры некорректные или пока не поддерживаются</p>';
+      message.textContent = "";
+      recommendation.textContent = "";
+      buyBtn.style.display = "none";
+
+      if (!gender || isNaN(height)) {
+        message.textContent = "Пожалуйста, выберите пол и введите рост.";
+        modelContainer.innerHTML = "";
+        return;
+      }
+
+      let modelURL = "";
+      let size = "";
+
+      if (gender === "male") {
+        if (height < 150 || height > 210) {
+          message.textContent = "Рост вне допустимого диапазона (150–210 см).";
+          modelContainer.innerHTML = "";
           return;
         }
-        if (height >= sizeRanges.male.high.height[0]) category = 'high';
-        else if (height >= sizeRanges.male.medium.height[0]) category = 'medium';
-        else category = 'low';
-        range = sizeRanges.male[category];
-        if (weight < range.weight[0] || weight > range.weight[1] ||
-            chest < range.chest[0] || chest > range.chest[1] ||
-            waist < range.waist[0] || waist > range.waist[1] ||
-            hips < range.hips[0] || hips > range.hips[1]) {
-          modelContainer.innerHTML = '<p class="message">Введённые параметры некорректные или пока не поддерживаются</p>';
-          return;
+        if (height >= 184) {
+          modelURL = "https://sketchfab.com/models/0ce8277ac3864dbbbde95aaa36140dc8/embed?autostart=1&transparent=1";
+          size = "50-52";
+          if ((chest && (chest < 98 || chest > 110)) || (waist && (waist < 80 || waist > 92)) || (hips && (hips < 98 || hips > 106))) {
+            message.textContent = "Введённые параметры некорректные или пока не поддерживаются";
+            modelContainer.innerHTML = "";
+            return;
+          }
+        } else if (height >= 173) {
+          modelURL = "https://sketchfab.com/models/0d344d388e7c465c802109737fcd3318/embed?autostart=1&transparent=1";
+          size = "48-50";
+          if ((chest && (chest < 92 || chest > 104)) || (waist && (waist < 76 || waist > 88)) || (hips && (hips < 94 || hips > 102))) {
+            message.textContent = "Введённые параметры некорректные или пока не поддерживаются";
+            modelContainer.innerHTML = "";
+            return;
+          }
+        } else {
+          modelURL = "https://sketchfab.com/models/fee26fdf9976410e9de46373683d1601/embed?autostart=1&transparent=1";
+          size = "46-48";
+          if ((chest && (chest < 88 || chest > 100)) || (waist && (waist < 72 || waist > 84)) || (hips && (hips < 90 || hips > 98))) {
+            message.textContent = "Введённые параметры некорректные или пока не поддерживаются";
+            modelContainer.innerHTML = "";
+            return;
+          }
         }
-      } else {
+      } else if (gender === "female") {
         if (height < 160 || height > 170) {
-          modelContainer.innerHTML = '<p class="message">Женские модели доступны при росте от 160 до 170 см</p>';
+          message.textContent = "Пока поддерживаются только модели женщин с ростом 160–170 см.";
+          modelContainer.innerHTML = "";
           return;
         }
-        category = (weightVal === '' || weight < sizeRanges.female.slim.weight[1]) ? 'slim' : 'fat';
-        range = sizeRanges.female[category];
-        // Проверяем только обхваты
-        if (chest < range.chest[0] || chest > range.chest[1] ||
-            waist < range.waist[0] || waist > range.waist[1] ||
-            hips < range.hips[0] || hips > range.hips[1]) {
-          modelContainer.innerHTML = '<p class="message">Введённые параметры некорректные или пока не поддерживаются</p>';
+        if (weightVal === '' || weight < 75) {
+          modelURL = "https://sketchfab.com/models/1d651c5b6f72424587272ef0ccf4cba1/embed?autostart=1&transparent=1";
+          size = "44";
+          if ((chest && (chest < 80 || chest > 92)) || (waist && (waist < 60 || waist > 72)) || (hips && (hips < 86 || hips > 96))) {
+            message.textContent = "Введённые параметры некорректные или пока не поддерживаются";
+            modelContainer.innerHTML = "";
+            return;
+          }
+        } else if (weight >= 75 && weight <= 90) {
+          modelURL = "https://sketchfab.com/models/9da5c5ef9cc745db8eeb0c8ad409f7a1/embed?autostart=1&transparent=1";
+          size = "46";
+          if ((chest && (chest < 94 || chest > 108)) || (waist && (waist < 74 || waist > 90)) || (hips && (hips < 98 || hips > 110))) {
+            message.textContent = "Введённые параметры некорректные или пока не поддерживаются";
+            modelContainer.innerHTML = "";
+            return;
+          }
+        } else {
+          message.textContent = "Вес вне допустимого диапазона (50–90 кг).";
+          modelContainer.innerHTML = "";
           return;
         }
       }
-      // Успешное отображение
-      const embed = modelEmbeds[gender][category];
-      const size = range.size;
-      modelContainer.innerHTML = `${embed}
-        <div class="recommendation">
-          <p>Рекомендуемый размер: ${size}</p>
-          <button onclick="window.location.href='https://www.ozon.ru/cart'">В корзину</button>
-        </div>`;
+
+      // Отображение iframe
+      modelContainer.innerHTML = `<div class="iframe-wrapper"><iframe title="3D Model" src="${modelURL}"></iframe></div>`;
+      recommendation.textContent = `Рекомендуемый размер: ${size}`;
+      buyBtn.style.display = "inline-block";
     }
-    tryOnButton.addEventListener('click', tryOn);
   </script>
 </body>
 </html>
